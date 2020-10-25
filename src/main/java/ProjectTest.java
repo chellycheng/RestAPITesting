@@ -1,5 +1,6 @@
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -36,6 +37,8 @@ class ProjectTest {
 	    final String project ="projects";
 	    final String completed = "completed";
 	    final String active = "active";
+	    
+	    
 
 	    @Test
 	    public void getProjects()
@@ -55,7 +58,7 @@ class ProjectTest {
 
 	            int todos_list_size = projects_list.size();
 	            //check size
-	            assertEquals(1, todos_list_size);
+	            assertTrue(todos_list_size >= 1);
 
 	        }
 	        catch(Exception PasrException){
@@ -110,9 +113,9 @@ class ProjectTest {
 	            assertEquals("false", (response_jason.get(completed)));
 	            assertEquals("true", (response_jason.get(active)));
 	            String id = (String)response_jason.get("id");
-	            HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+id );
-	            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-	            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+//	            HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+id );
+//	            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+//	            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 	
 	        }
 	        catch(Exception PasrException){
@@ -121,44 +124,6 @@ class ProjectTest {
 	
 	    }
 
-//	    @Test
-//	    public void createProjectWithoutId()
-//	            throws ClientProtocolException, IOException {
-//	        HttpPost request = new HttpPost(  baseUrl+ projectEndPoint );
-//	        String title_value = "429 Test Project";
-//	        String desc_value = "working in process";
-//	        String completed_status = "false";
-//	        String active_status = "true";
-//	        JSONObject json = new JSONObject();
-//	        json.put(title, title_value);
-//	        json.put(description, desc_value);
-//	        json.put(completed, completed_status);
-//	        json.put(active, active_status);
-//
-//	        StringEntity userEntity = new StringEntity(json.toString());
-//	        request.addHeader("content-type", "application/json");
-//	        request.setEntity(userEntity);
-//	        HttpResponse httpResponse = httpClient.execute( request );
-//
-//	        assertEquals(201, httpResponse.getStatusLine().getStatusCode());
-//	        try{
-//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-//	            assertEquals(title_value, (String) (response_jason.get(title)));
-//	            assertEquals(desc_value, (String) (response_jason.get(description)));
-//	            assertEquals(completed_status, (response_jason.get(completed)));
-//	            assertEquals(title_value, (response_jason.get(active)));
-//	            String id = (String)response_jason.get("id");
-//	            HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+id );
-//	            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-//	            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
-//
-//	        }
-//	        catch(Exception PasrException){
-//	            System.out.println("Failure at to_dos_post_title_param_test");
-//	        }
-//
-//	    }
 
 	    @Test
 	    public void getProjectById () throws ClientProtocolException, IOException{
@@ -191,32 +156,106 @@ class ProjectTest {
 	        }
 
 	    }
-//
-//	    @Test
-//	    public void to_dos_id_head_test()
-//	            throws ClientProtocolException, IOException {
-//	        String expected_id = "1";
-//	        HttpUriRequest request = new HttpGet(  baseUrl+ toDoEndIDPoint+ expected_id);
-//	        HttpResponse httpResponse = httpClient.execute( request );
-//	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
-//	    }
-//
-//	    @Test
-//	    public void to_dos_id_post_test()
-//	            throws ClientProtocolException, IOException{
-//
-//
-//
-//	    }
-//
-//	    @Test
-//	    public void to_dos_id_put_test()
-//	            throws ClientProtocolException, IOException{
-//
-//
-//
-//	    }
-//
+
+	    @Test
+	    public void to_dos_id_head_test()
+	            throws ClientProtocolException, IOException {
+	        String expected_id = "1";
+	        HttpUriRequest request = new HttpGet(  baseUrl+ projectEndPoint+ "?id="+ expected_id);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+	    }
+
+	    @Test
+	    public void postProjectWithId()
+	            throws ClientProtocolException, IOException{
+	    	 String expected_id = "1";
+	    	 HttpPost request = new HttpPost(  baseUrl+ projectEndPoint+ "/"+ expected_id);
+		        String title_value = "New Office Work";
+		        String desc_value = "new process";
+		        Boolean completed_status = true;
+		        Boolean active_status = true;
+		        JSONObject json = new JSONObject();
+		        json.put(title, title_value);
+		        json.put(description, desc_value);
+		        json.put(completed, completed_status);
+		        json.put(active, active_status);
+		
+		        StringEntity userEntity = new StringEntity(json.toString());
+		        request.addHeader("content-type", "application/json");
+		        request.setEntity(userEntity);
+		        HttpResponse httpResponse = httpClient.execute( request );
+		
+		        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+		        try{
+		            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+		            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+		            assertEquals(title_value, (String) (response_jason.get(title)));
+		            assertEquals(desc_value, (String) (response_jason.get(description)));
+		            assertEquals("true", (response_jason.get(completed)));
+		            assertEquals("true", (response_jason.get(active)));
+		            String id = (String)response_jason.get("id");
+		
+		        }
+		        catch(Exception PasrException){
+		            System.out.println("Failure at to_dos_post_title_param_test");
+		        }
+		
+
+
+
+	    }
+
+	    @Test
+	    public void updateProjectById()
+	            throws ClientProtocolException, IOException{
+	    	 this.createProjectWithoutId();
+	    	
+	    	 String expected_id = "2";
+	    	 HttpPut request = new HttpPut(  baseUrl+ projectEndPoint+ "/"+ expected_id);
+		        String title_value = "Office Work";
+		        String desc_value = "";
+		        Boolean completed_status = false;
+		        Boolean active_status = false;
+		        JSONObject json = new JSONObject();
+		        json.put(title, title_value);
+		        json.put(description, desc_value);
+		        json.put(completed, completed_status);
+		        json.put(active, active_status);
+		
+		        StringEntity userEntity = new StringEntity(json.toString());
+		        request.addHeader("content-type", "application/json");
+		        request.setEntity(userEntity);
+		        HttpResponse httpResponse = httpClient.execute( request );
+		
+		        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+		        try{
+		            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+		            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+		            assertEquals(title_value, (String) (response_jason.get(title)));
+		            assertEquals(desc_value, (String) (response_jason.get(description)));
+		            assertEquals("false", (response_jason.get(completed)));
+		            assertEquals("false", (response_jason.get(active)));
+		            String id = (String)response_jason.get("id");
+		
+		        }
+		        catch(Exception PasrException){
+		            System.out.println("Failure at to_dos_post_title_param_test");
+		        }
+
+	    }
+	    
+	    @Test
+	    public void deleteProjectById()
+	    		throws ClientProtocolException, IOException {
+	    	this.createProjectWithoutId();
+	    	String delete_id = "3";
+	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+ delete_id );
+            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+	    }
+	    
+
 //	    @Test
 //	    public void to_dos_id_cat_get_test()
 //	            throws ClientProtocolException, IOException {
