@@ -119,7 +119,7 @@ class ProjectTest {
 	
 	        }
 	        catch(Exception PasrException){
-	            System.out.println("Failure at to_dos_post_title_param_test");
+	            System.out.println("Failure at createProjectWithoutId");
 	        }
 	
 	    }
@@ -198,14 +198,12 @@ class ProjectTest {
 		
 		        }
 		        catch(Exception PasrException){
-		            System.out.println("Failure at to_dos_post_title_param_test");
+		            System.out.println("Failure at postProjectWithId");
 		        }
 		
 
-
-
 	    }
-
+	    
 	    @Test
 	    public void updateProjectById()
 	            throws ClientProtocolException, IOException{
@@ -240,7 +238,7 @@ class ProjectTest {
 		
 		        }
 		        catch(Exception PasrException){
-		            System.out.println("Failure at to_dos_post_title_param_test");
+		            System.out.println("Failure at updateProjectById");
 		        }
 
 	    }
@@ -256,82 +254,95 @@ class ProjectTest {
 	    }
 	    
 
-//	    @Test
-//	    public void to_dos_id_cat_get_test()
-//	            throws ClientProtocolException, IOException {
-//	        String expected_id = "1";
-//	        String expected_title = "Office";
-//	        String expected_description = "";
-//	        //Set request
-//	        HttpUriRequest request = new HttpGet(  baseUrl+ toDoEndIDPoint+ expected_id+categoriesEndPoint);
-//	        HttpResponse httpResponse = httpClient.execute(request);
-//
-//	        //Check response status
-//	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
-//	        //Check code
-//	        String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-//	        try{
-//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-//	            JSONArray todos_list = (JSONArray) response_jason.get(categories);
-//	            JSONObject todo_object = (JSONObject) todos_list.get(0);
-//	            assertEquals(expected_id, (String) (todo_object.get(id)));
-//	            assertEquals(expected_title, (String) (todo_object.get(title)));
-//	            assertEquals(expected_description, (String) (todo_object.get(description)));
-//
-//	        }
-//	        catch(Exception PasrException){
-//	            System.out.println("Failure");
-//	        }
-//
-//	    }
-//
-//	    @Test
-//	    public void to_dos_id_cat_head_test()
-//	            throws ClientProtocolException, IOException {
-//	        String expected_id = "1";
-//	        System.out.println(baseUrl+ toDoEndPoint+expected_id+categoriesEndPoint);
-//	        HttpUriRequest request = new HttpHead(  baseUrl+ toDoEndIDPoint+expected_id+categoriesEndPoint);
-//	        HttpResponse httpResponse = httpClient.execute( request );
-//	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
-//	    }
-//
-//	    @Test
-//	    public void to_dos_id_cat_post_empty_test()
-//	            throws ClientProtocolException, IOException {
-//	        String expected_id = "1";
-//	        HttpUriRequest request = new HttpPost(  baseUrl+ toDoEndIDPoint +expected_id+categoriesEndPoint);
-//	        HttpResponse httpResponse = httpClient.execute( request );
-//	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
-//	    }
-//
-//	    @Test
-//	    public void to_dos_id_cat_post_param_test()
-//	            throws ClientProtocolException, IOException {
-//	        String expected_id = "1";
-//	        HttpPost request = new HttpPost(baseUrl + toDoEndIDPoint + expected_id + categoriesEndPoint);
-//	        String title_value = "Test_cat_001";
-//	        JSONObject json = new JSONObject();
-//	        json.put(title, title_value);
-//	        StringEntity userEntity = new StringEntity(json.toString());
-//	        request.addHeader("content-type", "application/json");
-//	        request.setEntity(userEntity);
-//	        HttpResponse httpResponse = httpClient.execute(request);
-//
-//	        assertEquals(201, httpResponse.getStatusLine().getStatusCode());
-//	        try {
-//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-//	            assertEquals(title_value, (String) (response_jason.get(title)));
-//	            String id = (String) response_jason.get("id");
-//	            HttpUriRequest request_delete = new HttpDelete(baseUrl + toDoEndIDPoint + expected_id + categoriesEndPoint + "/" + id);
-//	            HttpResponse httpResponse_delete = httpClient.execute(request_delete);
-//	            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
-//
-//	        } catch (Exception PasrException) {
-//	            System.out.println("Failure at to_dos_post_title_param_test");
-//	        }
-//	    }
-//
+	    @Test
+	    public void getTodosByProjectId()
+	            throws ClientProtocolException, IOException {
+	        String expected_id = "1";
+	        String expected_title = "scan paperwork";
+	        String expected_status = "false";
+	        String expected_desc = "";
+	        //Set request
+	        HttpUriRequest request = new HttpGet(  baseUrl+ projectEndPoint+ "/"+ expected_id+tasksEndIDPoint);
+	        HttpResponse httpResponse = httpClient.execute(request);
+
+	        //Check response status
+	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+	        //Check code
+	        String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+	        try{
+	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+	            JSONArray todo_list = (JSONArray) response_jason.get(todos);
+	            JSONObject todo_object = (JSONObject) todo_list.get(0);
+	            assertEquals(expected_id, (String) (todo_object.get(id)));
+	            assertEquals(expected_title, (String) (todo_object.get(title)));
+	            assertEquals("false",  (todo_object.get(status)));
+	            assertEquals(expected_desc, (String) (todo_object.get(description)));
+
+	        }
+	        catch(Exception PasrException){
+	            System.out.println("Failure");
+	        }
+
+	    }
+
+	    @Test
+	    public void getTodoHeader()
+	            throws ClientProtocolException, IOException {
+	        String expected_id = "1";
+	        System.out.println(baseUrl+ projectEndPoint+ "/"+ expected_id+tasksEndIDPoint);
+	        HttpUriRequest request = new HttpHead(  baseUrl+ projectEndPoint+ "/"+ expected_id+tasksEndIDPoint);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+	    }
+
+	    @Test
+	    public void createTasksByTodoId()
+	            throws ClientProtocolException, IOException {
+    	 	String expected_id = "1";
+    	 	String expected_title = "scan paperwork";
+	        String expected_status = "false";
+	        String expected_desc = "";
+	        HttpPost request = new HttpPost(  baseUrl+ projectEndPoint+ "/"+ expected_id+tasksEndIDPoint);
+	        String todo_id = "1";
+	        JSONObject json = new JSONObject();
+	        json.put("id", todo_id);
+	 
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+
+	        // This API has bug in exploratory text
+	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+	        try{
+	        	JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+	            JSONArray todo_list = (JSONArray) response_jason.get(todos);
+	            JSONObject todo_object = (JSONObject) todo_list.get(0);
+	            assertEquals(expected_id, (String) (todo_object.get(id)));
+	            assertEquals(expected_title, (String) (todo_object.get(title)));
+	            assertEquals("false",  (todo_object.get(status)));
+	            assertEquals(expected_desc, (String) (todo_object.get(description)));
+	
+	        }
+	        catch(Exception PasrException){
+	            System.out.println("Failure at createTasksByTodoId");
+	        }
+		
+
+	    }
+
+	    @Test
+	    public void deleteTaskById()
+	            throws ClientProtocolException, IOException {
+	    	String project_id = "1";
+	    	String task_id = "2";
+	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+ project_id+ tasksEndIDPoint+"/"+ task_id );
+            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+	    }
+
 //	    @Test
 //	    public void to_dos_id_task_get_test()
 //	        throws ClientProtocolException, IOException {
