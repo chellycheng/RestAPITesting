@@ -11,10 +11,14 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
@@ -37,6 +41,26 @@ class ProjectTest {
 	    final String project ="projects";
 	    final String completed = "completed";
 	    final String active = "active";
+	    static HttpURLConnection connection;
+	    
+	    @BeforeEach
+	    public void setup() throws Exception{
+	        try{
+	            URL url = new URL(baseUrl);
+	            connection= (HttpURLConnection) url.openConnection();
+	            connection.connect();
+	            assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
+	        }
+	        catch(Exception e){
+	            System.out.println("Error in conneciton");
+	            throw new Exception();
+	        }
+	    }
+	    
+	    @AfterAll
+	    public static void after() {
+	        connection.disconnect();
+	    }
 	    
 	    
 
