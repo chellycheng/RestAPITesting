@@ -662,7 +662,7 @@ class CategoriesTest {
 	    public void deleteTodosById1() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/114514/todos/1");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+            assertEquals(404, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
 	    @Test
