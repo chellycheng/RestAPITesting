@@ -258,7 +258,7 @@ class ProjectTest {
 	    public void getTodosByProjectId()
 	            throws ClientProtocolException, IOException {
 	        String expected_id = "1";
-	        String todo_id = "1";
+	        String todo_id = "2";
 	        String expected_title = "scan paperwork";
 	        String expected_status = "false";
 	        String expected_desc = "";
@@ -289,7 +289,7 @@ class ProjectTest {
 	    @Test
 	    public void getTodoHeader()
 	            throws ClientProtocolException, IOException {
-	        String expected_id = "1";
+	        String expected_id = "101";
 	        System.out.println(baseUrl+ projectEndPoint+ "/"+ expected_id+tasksEndIDPoint);
 	        HttpUriRequest request = new HttpHead(  baseUrl+ projectEndPoint+ "/"+ expected_id+tasksEndIDPoint);
 	        HttpResponse httpResponse = httpClient.execute( request );
@@ -347,7 +347,7 @@ class ProjectTest {
 	    @Test
 	    public void getCategoryById()
 	        throws ClientProtocolException, IOException {
-	        String project_id = "1";
+	        String project_id = "131";
 	        String expected_id = "1";
 	        //Set request
 	        HttpGet request = new HttpGet(  baseUrl+ projectEndPoint+ "/"+ project_id+categoriesEndPoint);
@@ -362,7 +362,7 @@ class ProjectTest {
 	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
 	            JSONArray category_list = (JSONArray) response_jason.get(categories);
 	            JSONObject category_object = (JSONObject) category_list.get(0);
-	            assertEquals("5", (String) (category_object.get(id)));
+	            assertEquals(expected_id, (String) (category_object.get(id)));
 
 	        }
 	        catch(Exception PasrException){
@@ -374,7 +374,7 @@ class ProjectTest {
 	    @Test
 	    public void getHeadersByCategory()
 	        throws ClientProtocolException, IOException {
-	    	  String expected_id = "1";
+	    	  String expected_id = "99";
 		        HttpUriRequest request = new HttpHead(  baseUrl+ projectEndPoint+ "/"+ expected_id+categoriesEndPoint);
 		        HttpResponse httpResponse = httpClient.execute( request );
 		        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
