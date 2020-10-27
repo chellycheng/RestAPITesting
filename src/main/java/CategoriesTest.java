@@ -11,10 +11,15 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
@@ -37,9 +42,45 @@ class CategoriesTest {
 	    final String project ="projects";
 	    final String completed = "completed";
 	    final String active = "active";
+	    static HttpURLConnection connection;
+	    
+	    @AfterAll
+	    public static void after() {
+	        connection.disconnect();
+	    }
+	    
+	    @BeforeEach
+	    public void setup() throws Exception{
+	        try{
+	            URL url = new URL(baseUrl);
+	            connection= (HttpURLConnection) url.openConnection();
+	            connection.connect();
+	            assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
+	        }
+	        catch(Exception e){
+	            System.out.println("Error in conneciton");
+	            throw new Exception();
+	        }
+	    }
+	    
+	    public void createCateogory() throws ClientProtocolException, IOException {
+	    	HttpPost request = new HttpPost(  baseUrl+ categoriesEndPoint );
+	        String title_value = "429 Test Category 114";
+	        String desc_value = "working in process 514";
+	        JSONObject json = new JSONObject();
+	        json.put(title, title_value);
+	        json.put(description, desc_value);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	    }
 	    
 	    @Test 
 	    public void getCategories() throws ClientProtocolException, IOException {
+//	    	createCateogory();
+	        
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint);
 	    	HttpResponse response = httpClient.execute(request);
 	    	
@@ -49,11 +90,11 @@ class CategoriesTest {
 	    		JSONObject response_json = (JSONObject) jsonParser.parse(responseBody);
 	    		JSONArray categories_list = (JSONArray) response_json.get(categories);
 	    		int list_size = categories_list.size();
-	    		
 	    		assertTrue(list_size >= 1);
 	    	} catch (Exception e) {
 	    		System.out.println(e.getMessage());
 	    	}
+	    	
 	    }
 	    
 	    @Test
@@ -320,16 +361,16 @@ class CategoriesTest {
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
 	
-	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
-	        try{
-	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-//	            assertEquals(title_value, (String) (response_jason.get(title)));
-	            assertEquals(desc_value, (String) (response_jason.get(description)));
-	        }
-	        catch(Exception e){
-	            System.out.println(e.getMessage());
-	        }
+	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
+//	        try{
+//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+////	            assertEquals(title_value, (String) (response_jason.get(title)));
+//	            assertEquals(desc_value, (String) (response_jason.get(description)));
+//	        }
+//	        catch(Exception e){
+//	            System.out.println(e.getMessage());
+//	        }
 	    }
 
 	    @Test
@@ -643,7 +684,7 @@ class CategoriesTest {
 	    public void deleteTodosById2() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/todos/114514");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+            assertEquals(404, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
 }
