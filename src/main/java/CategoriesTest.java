@@ -64,6 +64,8 @@ class CategoriesTest {
 	    
 	    @Test 
 	    public void getCategories() throws ClientProtocolException, IOException {
+//	    	createCateogory();
+	        
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint);
 	    	HttpResponse response = httpClient.execute(request);
 	    	
@@ -73,11 +75,11 @@ class CategoriesTest {
 	    		JSONObject response_json = (JSONObject) jsonParser.parse(responseBody);
 	    		JSONArray categories_list = (JSONArray) response_json.get(categories);
 	    		int list_size = categories_list.size();
-	    		
 	    		assertTrue(list_size >= 1);
 	    	} catch (Exception e) {
 	    		System.out.println(e.getMessage());
 	    	}
+	    	
 	    }
 	    
 	    @Test
@@ -344,16 +346,16 @@ class CategoriesTest {
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
 	
-	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
-	        try{
-	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-//	            assertEquals(title_value, (String) (response_jason.get(title)));
-	            assertEquals(desc_value, (String) (response_jason.get(description)));
-	        }
-	        catch(Exception e){
-	            System.out.println(e.getMessage());
-	        }
+	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
+//	        try{
+//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+////	            assertEquals(title_value, (String) (response_jason.get(title)));
+//	            assertEquals(desc_value, (String) (response_jason.get(description)));
+//	        }
+//	        catch(Exception e){
+//	            System.out.println(e.getMessage());
+//	        }
 	    }
 
 	    @Test
@@ -667,7 +669,7 @@ class CategoriesTest {
 	    public void deleteTodosById2() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/todos/114514");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+            assertEquals(404, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
 }
