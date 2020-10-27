@@ -342,7 +342,6 @@ public class TodoTest {
     public void to_dos_id_cat_head_test()
             throws ClientProtocolException, IOException {
         String expected_id = "1";
-        System.out.println(baseUrl+ toDoEndPoint+expected_id+categoriesEndPoint);
         HttpUriRequest request = new HttpHead(  baseUrl+ toDoEndIDPoint+expected_id+categoriesEndPoint);
         HttpResponse httpResponse = httpClient.execute( request );
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
@@ -352,7 +351,6 @@ public class TodoTest {
     public void to_dos_id_cat_head_invalid_test()
             throws ClientProtocolException, IOException {
         String expected_id = "100";
-        System.out.println(baseUrl+ toDoEndPoint+expected_id+categoriesEndPoint);
         HttpUriRequest request = new HttpHead(  baseUrl+ toDoEndIDPoint+expected_id+categoriesEndPoint);
         HttpResponse httpResponse = httpClient.execute( request );
         // Unit test identify bug
@@ -446,7 +444,6 @@ public class TodoTest {
     public void to_dos_id_task_head_test()
         throws ClientProtocolException, IOException {
         String expected_id = "1";
-        System.out.println(baseUrl+ toDoEndPoint+expected_id+categoriesEndPoint);
         HttpUriRequest request = new HttpHead(  baseUrl+ toDoEndIDPoint+expected_id+tasksOfEndPoint);
         HttpResponse httpResponse = httpClient.execute( request );
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
