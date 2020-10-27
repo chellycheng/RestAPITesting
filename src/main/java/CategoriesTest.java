@@ -89,6 +89,112 @@ class CategoriesTest {
 	        }
 	    }
 	    
+	    @Test
+	    public void createCategoryWithoutId2() throws ClientProtocolException, IOException {
+	        HttpPost request = new HttpPost(  baseUrl+ categoriesEndPoint );
+	        String title_value = "429 Test Category 3";
+	        String desc_value = "working in process 3";
+	        JSONObject json = new JSONObject();
+	        json.put(title, title_value);
+//	        json.put(description, desc_value);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(201, httpResponse.getStatusLine().getStatusCode());
+	        try{
+	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+	            assertEquals(title_value, (String) (response_jason.get(title)));
+//	            assertEquals(desc_value, (String) (response_jason.get(description)));
+	        }
+	        catch(Exception e){
+	            System.out.println(e.getMessage());
+	        }
+	    }
+	    
+	    @Test
+	    public void createCategoryWithoutId3() throws ClientProtocolException, IOException {
+	        HttpPost request = new HttpPost(  baseUrl+ categoriesEndPoint );
+	        String title_value = "429 Test Category 4";
+	        String desc_value = "working in process 4";
+	        JSONObject json = new JSONObject();
+//	        json.put(title, title_value);
+	        json.put(description, desc_value);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
+//	        try{
+//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+////	            assertEquals(title_value, (String) (response_jason.get(title)));
+//	            assertEquals(desc_value, (String) (response_jason.get(description)));
+//	        }
+//	        catch(Exception e){
+//	            System.out.println(e.getMessage());
+//	        }
+	    }
+	    
+	    @Test
+	    public void createCategoryWithoutId4() throws ClientProtocolException, IOException {
+	        HttpPost request = new HttpPost(  baseUrl+ categoriesEndPoint );
+	        String title_value = "429 Test Category 5";
+	        String desc_value = "working in process 5";
+	        JSONObject json = new JSONObject();
+	        json.put(title, title_value);
+	        json.put(description, desc_value);
+	        json.put(id, 1);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
+//	        try{
+//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+//	            assertEquals(title_value, (String) (response_jason.get(title)));
+//	            assertEquals(desc_value, (String) (response_jason.get(description)));
+//	        }
+//	        catch(Exception e){
+//	            System.out.println(e.getMessage());
+//	        }
+	    }
+	    
+	    @Test
+	    public void createCategoryWithoutId5() throws ClientProtocolException, IOException {
+	        HttpPost request = new HttpPost(  baseUrl+ categoriesEndPoint );
+	        String title_value = "429 Test Category 5";
+	        String desc_value = "working in process 5";
+	        JSONObject json = new JSONObject();
+//	        json.put(title, title_value);
+//	        json.put(description, desc_value);
+//	        json.put(id, 1);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
+//	        try{
+//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+//	            assertEquals(title_value, (String) (response_jason.get(title)));
+//	            assertEquals(desc_value, (String) (response_jason.get(description)));
+//	        }
+//	        catch(Exception e){
+//	            System.out.println(e.getMessage());
+//	        }
+	    }
+	    
 	    @Test 
 	    public void getCategoriesById() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/1");
@@ -107,6 +213,14 @@ class CategoriesTest {
 	    	}
 	    }
 	    
+	    @Test 
+	    public void getCategoriesById2() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/1000");
+	    	HttpResponse response = httpClient.execute(request);
+	    	
+	    	assertEquals(404, response.getStatusLine().getStatusCode());
+	    }
+	    
 	    @Test
 	    public void CategoryHeadById() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/1");
@@ -116,12 +230,19 @@ class CategoriesTest {
 	    }
 	    
 	    @Test
+	    public void CategoryHeadById2() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/100000000");
+	    	HttpResponse response = httpClient.execute(request);
+	    	
+	    	assertEquals(404, response.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
 	    public void postCategoryById() throws ClientProtocolException, IOException {
 	    	HttpPut request = new HttpPut(baseUrl+categoriesEndPoint+"/1");
 	    	String title_value = "429 Test Category 1";
 	        String desc_value = "working in process 1";
 	        JSONObject json = new JSONObject();
-	        json.put(id, 1);
 	        json.put(title, title_value);
 	        json.put(description, desc_value);
 	
@@ -135,6 +256,75 @@ class CategoriesTest {
 	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
 	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
 	            assertEquals(title_value, (String) (response_jason.get(title)));
+	            assertEquals(desc_value, (String) (response_jason.get(description)));
+	        }
+	        catch(Exception e){
+	            System.out.println(e.getMessage());
+	        }
+	    }
+	    
+	    @Test
+	    public void postCategoryById1() throws ClientProtocolException, IOException {
+	    	HttpPut request = new HttpPut(baseUrl+categoriesEndPoint+"/10000");
+	    	String title_value = "429 Test Category 2";
+	        String desc_value = "working in process 2";
+	        JSONObject json = new JSONObject();
+	        json.put(title, title_value);
+	        json.put(description, desc_value);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(404, httpResponse.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
+	    public void postCategoryById2() throws ClientProtocolException, IOException {
+	    	HttpPut request = new HttpPut(baseUrl+categoriesEndPoint+"/1");
+	    	String title_value = "429 Test Category 3";
+	        String desc_value = "working in process 3";
+	        JSONObject json = new JSONObject();
+	        json.put(title, title_value);
+//	        json.put(description, desc_value);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+	        try{
+	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+	            assertEquals(title_value, (String) (response_jason.get(title)));
+//	            assertEquals(desc_value, (String) (response_jason.get(description)));
+	        }
+	        catch(Exception e){
+	            System.out.println(e.getMessage());
+	        }
+	    }
+	    
+	    @Test
+	    public void postCategoryById3() throws ClientProtocolException, IOException {
+	    	HttpPut request = new HttpPut(baseUrl+categoriesEndPoint+"/1");
+	    	String title_value = "429 Test Category 4";
+	        String desc_value = "working in process 4";
+	        JSONObject json = new JSONObject();
+//	        json.put(title, title_value);
+	        json.put(description, desc_value);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+	        try{
+	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+//	            assertEquals(title_value, (String) (response_jason.get(title)));
 	            assertEquals(desc_value, (String) (response_jason.get(description)));
 	        }
 	        catch(Exception e){
@@ -170,10 +360,86 @@ class CategoriesTest {
 	    }
 	    
 	    @Test
+	    public void putCategoryById1() throws ClientProtocolException, IOException {
+	    	HttpPost request = new HttpPost(baseUrl+categoriesEndPoint+"/10000");
+	    	String title_value = "429 Test Category 2";
+	        String desc_value = "working in process 2";
+	        JSONObject json = new JSONObject();
+	        json.put(title, title_value);
+	        json.put(description, desc_value);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(404, httpResponse.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
+	    public void putCategoryById2() throws ClientProtocolException, IOException {
+	    	HttpPost request = new HttpPost(baseUrl+categoriesEndPoint+"/1");
+	    	String title_value = "429 Test Category 3";
+	        String desc_value = "working in process 3";
+	        JSONObject json = new JSONObject();
+	        json.put(title, title_value);
+//	        json.put(description, desc_value);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+	        try{
+	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+	            assertEquals(title_value, (String) (response_jason.get(title)));
+//	            assertEquals(desc_value, (String) (response_jason.get(description)));
+	        }
+	        catch(Exception e){
+	            System.out.println(e.getMessage());
+	        }
+	    }
+	    
+	    @Test
+	    public void putCategoryById3() throws ClientProtocolException, IOException {
+	    	HttpPost request = new HttpPost(baseUrl+categoriesEndPoint+"/1");
+	    	String title_value = "429 Test Category 4";
+	        String desc_value = "working in process 4";
+	        JSONObject json = new JSONObject();
+//	        json.put(title, title_value);
+	        json.put(description, desc_value);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	
+	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+	        try{
+	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+//	            assertEquals(title_value, (String) (response_jason.get(title)));
+	            assertEquals(desc_value, (String) (response_jason.get(description)));
+	        }
+	        catch(Exception e){
+	            System.out.println(e.getMessage());
+	        }
+	    }
+	    
+	    @Test
 	    public void deleteCategoryById() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/2");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
             assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
+	    public void deleteCategoryById2() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/200");
+            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+            assertEquals(404, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
 	    @Test
@@ -208,6 +474,27 @@ class CategoriesTest {
 	    }
 	    
 	    @Test
+	    public void createProjectsToSpecificCategoryById2() throws ClientProtocolException, IOException {
+	    	HttpPost request = new HttpPost(baseUrl+categoriesEndPoint+"/1114514/projects");
+	    	String title_value = "429 Test Project";
+	        String desc_value = "working in process";
+	        Boolean completed_status = false;
+	        Boolean active_status = true;
+	        JSONObject json = new JSONObject();
+	        json.put(title, title_value);
+	        json.put(description, desc_value);
+	        json.put(completed, completed_status);
+	        json.put(active, active_status);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	        
+	        assertEquals(404, httpResponse.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
 	    public void getProjectsByCategoryId() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/1/projects");
 	    	HttpResponse response = httpClient.execute(request);
@@ -225,18 +512,33 @@ class CategoriesTest {
 	    }
 	    
 	    @Test
+	    public void getProjectsByCategoryId1() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/114514/projects");
+	    	HttpResponse response = httpClient.execute(request);
+	    	
+	    	assertEquals(404, response.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
 	    public void ProjectsHeadByCategoryId() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/1/projects");
 	    	HttpResponse response = httpClient.execute(request);
 	    	assertEquals(200, response.getStatusLine().getStatusCode());
 	    }
 	    
-//	    @Test
-//	    public void deleteProjectsByCategoryId() throws ClientProtocolException, IOException {
-//	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/projects/1");
-//            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-//            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
-//	    }
+	    @Test
+	    public void ProjectsHeadByCategoryId1() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/114514/projects");
+	    	HttpResponse response = httpClient.execute(request);
+	    	assertEquals(404, response.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
+	    public void deleteProjectsByCategoryId() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/projects/1");
+            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+	    }
 	    
 	    @Test
 	    public void getTodosByCategoryID() throws ClientProtocolException, IOException {
@@ -256,11 +558,27 @@ class CategoriesTest {
 	    }
 	    
 	    @Test
+	    public void getTodosByCategoryID1() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/114514/todos");
+	    	HttpResponse response = httpClient.execute(request);
+	    	
+	    	assertEquals(404, response.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
 	    public void TodosHeadByCategoryID() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/1/todos");
 	    	HttpResponse response = httpClient.execute(request);
 	    	
 	    	assertEquals(200, response.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
+	    public void TodosHeadByCategoryID2() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/114514/todos");
+	    	HttpResponse response = httpClient.execute(request);
+	    	
+	    	assertEquals(404, response.getStatusLine().getStatusCode());
 	    }
 	    
 	    @Test
@@ -291,11 +609,41 @@ class CategoriesTest {
 	        }
 	    }
 	    
-//	    @Test
-//	    public void deleteTodosById() throws ClientProtocolException, IOException {
-//	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/todos/1");
-//            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-//            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
-//	    }
+	    @Test
+	    public void createTodosByCategoryID1() throws ClientProtocolException, IOException {
+	    	HttpPost request = new HttpPost(baseUrl+categoriesEndPoint+"/114514/todos");
+	    	String title_value = "429 Test todo 123";
+	        String desc_value = "4567";
+	        Boolean completed_status = false;
+	        JSONObject json = new JSONObject();
+	        json.put(title, title_value);
+	        json.put(description, desc_value);
+	        json.put("doneStatus", completed_status);
+	
+	        StringEntity userEntity = new StringEntity(json.toString());
+	        request.addHeader("content-type", "application/json");
+	        request.setEntity(userEntity);
+	        HttpResponse httpResponse = httpClient.execute( request );
+	    }
+	    
+	    public void deleteTodosById() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/todos/1");
+            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
+	    public void deleteTodosById1() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/114514/todos/1");
+            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+	    }
+	    
+	    @Test
+	    public void deleteTodosById2() throws ClientProtocolException, IOException {
+	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/todos/114514");
+            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
+	    }
 	    
 }
