@@ -13,7 +13,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer.Alphanumeric;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
@@ -23,7 +25,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
-class CategoriesTest {
+@TestMethodOrder(Alphanumeric.class)
+public class CategoriesTest {
 
 	 public static final String baseUrl = "http://localhost:4567/";
 	    public static final String projectEndPoint = "projects";

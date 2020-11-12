@@ -12,7 +12,9 @@ import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer.Alphanumeric;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
@@ -20,7 +22,7 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.net.*;
 
-
+@TestMethodOrder(Alphanumeric.class)
 public class TodoTest {
 
     public static final String baseUrl = "http://localhost:4567/";
