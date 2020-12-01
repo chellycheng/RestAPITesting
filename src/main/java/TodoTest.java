@@ -10,15 +10,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.net.*;
+import java.util.ArrayList;
 
 
 public class TodoTest {
@@ -39,24 +38,42 @@ public class TodoTest {
     final String categories = "categories";
     final String project = "projects";
     static HttpURLConnection connection;
+    private static Process process;
+    long allStart;
+    long partStart;
+
 
     @BeforeEach
     public void setup() throws Exception{
         try{
+            allStart = System.currentTimeMillis();
+            ArrayList<String> command = new ArrayList<String>();
+            command.add("java"); // quick and dirty for unix
+            command.add("-jar");
+            command.add("/Users/hehuimincheng/ECSE429/runTodoManagerRestAPI-1.5.5.jar");
+
+            ProcessBuilder builder = new ProcessBuilder(command);
+            builder.redirectErrorStream(true);
+            process = builder.inheritIO().start();
+            Thread.sleep(500);
             URL url = new URL(baseUrl);
             connection= (HttpURLConnection) url.openConnection();
             connection.connect();
             assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
+            partStart = System.currentTimeMillis();
         }
         catch(Exception e){
-            System.out.println("Error in conneciton");
+            System.out.println("Error in connection");
             throw new Exception();
         }
     }
 
-    @AfterAll
-    public static void after() {
-        connection.disconnect();
+    @AfterEach
+    public void afterClass() throws Exception{
+        System.out.println("The execute time without setup, teardown is  " + (System.currentTimeMillis()-partStart)/1000.0 +"s");
+        process.destroy();
+        Thread.sleep(500);
+        System.out.println("The execution time include setup, teardown, and check correctness is " + (System.currentTimeMillis()-allStart)/1000.0 + "s");
     }
 
     @Test
@@ -66,7 +83,7 @@ public class TodoTest {
         //Set request
         HttpUriRequest request = new HttpGet(baseUrl + toDoEndPoint);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         //Check response status
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
         //Check code
@@ -90,6 +107,7 @@ public class TodoTest {
             throws ClientProtocolException, IOException {
         HttpUriRequest request = new HttpHead(baseUrl + toDoEndPoint);
         HttpResponse httpResponse = httpClient.execute(request);
+        print_time_so_far(partStart);
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
     }
 
@@ -99,6 +117,7 @@ public class TodoTest {
 
         HttpUriRequest request = new HttpPost(baseUrl + toDoEndPoint);
         HttpResponse httpResponse = httpClient.execute(request);
+        print_time_so_far(partStart);
         assertEquals(400, httpResponse.getStatusLine().getStatusCode());
 
     }
@@ -117,7 +136,7 @@ public class TodoTest {
         request.addHeader("content-type", "application/json");
         request.setEntity(userEntity);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         assertEquals(201, httpResponse.getStatusLine().getStatusCode());
         try {
             String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -144,7 +163,7 @@ public class TodoTest {
         //Set request
         HttpUriRequest request = new HttpGet(baseUrl + toDoEndIDPoint + expected_id);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         //Check response status
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
         //Check code
@@ -173,7 +192,7 @@ public class TodoTest {
         //Set request
         HttpUriRequest request = new HttpGet(baseUrl + toDoEndIDPoint + expected_id);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         //Check response status
         assertEquals(404, httpResponse.getStatusLine().getStatusCode());
 
@@ -185,6 +204,7 @@ public class TodoTest {
         String expected_id = "1";
         HttpUriRequest request = new HttpGet(baseUrl + toDoEndIDPoint + expected_id);
         HttpResponse httpResponse = httpClient.execute(request);
+        print_time_so_far(partStart);
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
     }
 
@@ -194,6 +214,7 @@ public class TodoTest {
         String expected_id = "100";
         HttpUriRequest request = new HttpGet(baseUrl + toDoEndIDPoint + expected_id);
         HttpResponse httpResponse = httpClient.execute(request);
+        print_time_so_far(partStart);
         assertEquals(404, httpResponse.getStatusLine().getStatusCode());
     }
 
@@ -209,7 +230,7 @@ public class TodoTest {
         request.addHeader("content-type", "application/json");
         request.setEntity(userEntity);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         assertEquals(404, httpResponse.getStatusLine().getStatusCode());
 
     }
@@ -227,7 +248,7 @@ public class TodoTest {
         request.addHeader("content-type", "application/json");
         request.setEntity(userEntity);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
         String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
         try {
@@ -266,7 +287,7 @@ public class TodoTest {
         request.addHeader("content-type", "application/json");
         request.setEntity(userEntity);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         assertEquals(404, httpResponse.getStatusLine().getStatusCode());
     }
 
@@ -282,7 +303,7 @@ public class TodoTest {
         request.addHeader("content-type", "application/json");
         request.setEntity(userEntity);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
         String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
         try{
@@ -306,7 +327,7 @@ public class TodoTest {
         //Set request
         HttpUriRequest request = new HttpGet(  baseUrl+ toDoEndIDPoint+ expected_id+categoriesEndPoint);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         //Check response status
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
         //Check code
@@ -333,7 +354,7 @@ public class TodoTest {
         //Set request
         HttpUriRequest request = new HttpGet(  baseUrl+ toDoEndIDPoint+ expected_id+categoriesEndPoint);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         // Unit test identify bug
         assertEquals(404, httpResponse.getStatusLine().getStatusCode());
     }
@@ -342,8 +363,10 @@ public class TodoTest {
     public void to_dos_id_cat_head_test()
             throws ClientProtocolException, IOException {
         String expected_id = "1";
+        System.out.println(baseUrl+ toDoEndIDPoint+expected_id+categoriesEndPoint);
         HttpUriRequest request = new HttpHead(  baseUrl+ toDoEndIDPoint+expected_id+categoriesEndPoint);
         HttpResponse httpResponse = httpClient.execute( request );
+        print_time_so_far(partStart);
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
     }
 
@@ -351,8 +374,10 @@ public class TodoTest {
     public void to_dos_id_cat_head_invalid_test()
             throws ClientProtocolException, IOException {
         String expected_id = "100";
+        System.out.println(baseUrl+ toDoEndPoint+expected_id+categoriesEndPoint);
         HttpUriRequest request = new HttpHead(  baseUrl+ toDoEndIDPoint+expected_id+categoriesEndPoint);
         HttpResponse httpResponse = httpClient.execute( request );
+        print_time_so_far(partStart);
         // Unit test identify bug
         assertEquals(404, httpResponse.getStatusLine().getStatusCode());
     }
@@ -363,6 +388,7 @@ public class TodoTest {
         String expected_id = "1";
         HttpUriRequest request = new HttpPost(  baseUrl+ toDoEndIDPoint +expected_id+categoriesEndPoint);
         HttpResponse httpResponse = httpClient.execute( request );
+        print_time_so_far(partStart);
         assertEquals(400, httpResponse.getStatusLine().getStatusCode());
     }
 
@@ -378,7 +404,7 @@ public class TodoTest {
         request.addHeader("content-type", "application/json");
         request.setEntity(userEntity);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         assertEquals(201, httpResponse.getStatusLine().getStatusCode());
         try {
             String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -403,7 +429,7 @@ public class TodoTest {
         //Set request
         HttpUriRequest request = new HttpGet(  baseUrl+ toDoEndIDPoint+ expected_id+tasksOfEndPoint);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         //Check response status
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
         //Check code
@@ -432,7 +458,7 @@ public class TodoTest {
         //Set request
         HttpUriRequest request = new HttpGet(  baseUrl+ toDoEndIDPoint+ expected_id+tasksOfEndPoint);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         //Check response status
         // Unit test identify bug
         assertEquals(404, httpResponse.getStatusLine().getStatusCode());
@@ -444,8 +470,10 @@ public class TodoTest {
     public void to_dos_id_task_head_test()
         throws ClientProtocolException, IOException {
         String expected_id = "1";
+        System.out.println(baseUrl+ toDoEndPoint+expected_id+categoriesEndPoint);
         HttpUriRequest request = new HttpHead(  baseUrl+ toDoEndIDPoint+expected_id+tasksOfEndPoint);
         HttpResponse httpResponse = httpClient.execute( request );
+        print_time_so_far(partStart);
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
     }
 
@@ -456,6 +484,7 @@ public class TodoTest {
         HttpUriRequest request = new HttpPost(  baseUrl+ toDoEndIDPoint +expected_id+tasksOfEndPoint);
         HttpResponse httpResponse = httpClient.execute( request );
         // Unit test identify bug
+        print_time_so_far(partStart);
         assertEquals(400, httpResponse.getStatusLine().getStatusCode());
     }
 
@@ -471,7 +500,7 @@ public class TodoTest {
         request.addHeader("content-type", "application/json");
         request.setEntity(userEntity);
         HttpResponse httpResponse = httpClient.execute(request);
-
+        print_time_so_far(partStart);
         assertEquals(201, httpResponse.getStatusLine().getStatusCode());
         try {
             String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -485,5 +514,9 @@ public class TodoTest {
         } catch (Exception PasrException) {
             System.out.println("Failure at to_dos_post_title_param_test");
         }
+    }
+
+    private void print_time_so_far(long start_time){
+        System.out.println("The execute time without setup, teardown, and check correctness is " + (System.currentTimeMillis()-start_time)/1000.0 + "s");
     }
 }
