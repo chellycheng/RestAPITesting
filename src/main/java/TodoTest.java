@@ -10,17 +10,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.net.*;
+import java.util.ArrayList;
 
 @TestMethodOrder(Alphanumeric.class)
 public class TodoTest {
@@ -41,24 +39,42 @@ public class TodoTest {
     final String categories = "categories";
     final String project = "projects";
     static HttpURLConnection connection;
+    private static Process process;
+    long allStart;
+    long partStart;
+
 
     @BeforeEach
     public void setup() throws Exception{
         try{
+            allStart = System.currentTimeMillis();
+            ArrayList<String> command = new ArrayList<String>();
+            command.add("java"); // quick and dirty for unix
+            command.add("-jar");
+            command.add("/Users/hehuimincheng/ECSE429/runTodoManagerRestAPI-1.5.5.jar");
+
+            ProcessBuilder builder = new ProcessBuilder(command);
+            builder.redirectErrorStream(true);
+            process = builder.inheritIO().start();
+            Thread.sleep(500);
             URL url = new URL(baseUrl);
             connection= (HttpURLConnection) url.openConnection();
             connection.connect();
             assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
+            partStart = System.currentTimeMillis();
         }
         catch(Exception e){
-            System.out.println("Error in conneciton");
+            System.out.println("Error in connection");
             throw new Exception();
         }
     }
 
-    @AfterAll
-    public static void after() {
-        connection.disconnect();
+    @AfterEach
+    public void afterClass() throws Exception{
+        System.out.println("The execute time without setup, teardown is  " + (System.currentTimeMillis()-partStart)/1000.0 +"s");
+        process.destroy();
+        Thread.sleep(500);
+        System.out.println("The execution time include setup, teardown, and check correctness is " + (System.currentTimeMillis()-allStart)/1000.0 + "s");
     }
 
     @Test
