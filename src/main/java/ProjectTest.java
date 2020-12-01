@@ -103,7 +103,7 @@ public class ProjectTest {
 	            assertTrue(todos_list_size >= 1);
 
 	        }
-	        catch(Exception PasrException){
+	        catch(Exception ParseException){
 	            System.out.println("Failure");
 	        }
 
@@ -148,7 +148,7 @@ public class ProjectTest {
 	            String id = (String)response_jason.get("id");
 	
 	        }
-	        catch(Exception PasrException){
+	        catch(Exception ParseException){
 	            System.out.println("Failure at createProjectWithoutId");
 	        }
 	
@@ -181,8 +181,7 @@ public class ProjectTest {
 	            assertEquals(expected_description, (String) (project_object.get(description)));
 
 	        }
-	        catch(Exception PasrException){
-	            System.out.println("Failure");
+	        catch(Exception ParseException){
 	        }
 
 	    }
@@ -228,7 +227,7 @@ public class ProjectTest {
 		            String id = (String)response_jason.get("id");
 		
 		        }
-		        catch(Exception PasrException){
+		        catch(Exception ParseException){
 		            System.out.println("Failure at postProjectWithId");
 		        }
 		
@@ -268,7 +267,7 @@ public class ProjectTest {
 		            String id = (String)response_jason.get("id");
 		
 		        }
-		        catch(Exception PasrException){
+		        catch(Exception ParseException){
 		            System.out.println("Failure at updateProjectById");
 		        }
 
@@ -281,7 +280,6 @@ public class ProjectTest {
 	    	String delete_id = "3";
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+ delete_id );
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-			print_time_so_far(partStart);
             assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
@@ -311,7 +309,7 @@ public class ProjectTest {
 	            assertEquals(expected_desc, (String) (todo_object.get(description)));
 
 	        }
-	        catch(Exception PasrException){
+	        catch(Exception ParseException){
 	            System.out.println("Failure");
 	        }
 
@@ -358,7 +356,7 @@ public class ProjectTest {
 	            assertEquals(expected_desc, (String) (todo_object.get(description)));
 	
 	        }
-	        catch(Exception PasrException){
+	        catch(Exception ParseException){
 	            System.out.println("Failure at createTasksByTodoId");
 	        }
 		
@@ -397,8 +395,7 @@ public class ProjectTest {
 	            assertEquals(expected_id, (String) (category_object.get(id)));
 
 	        }
-	        catch(Exception PasrException){
-	            System.out.println("Failure");
+	        catch(Exception ParseException){
 	        }
 
 	    }
@@ -438,7 +435,7 @@ public class ProjectTest {
 	            assertEquals(category_id, (String) (category_object.get(id)));
 	
 	        }
-	        catch(Exception PasrException){
+	        catch(Exception ParseException){
 	            System.out.println("Failure at postCategoryById");
 	        }
 

@@ -203,6 +203,7 @@ public class TodoTest {
         String expected_id = "1";
         HttpUriRequest request = new HttpGet(baseUrl + toDoEndIDPoint + expected_id);
         HttpResponse httpResponse = httpClient.execute(request);
+        print_time_so_far(partStart);
         assertEquals(200, httpResponse.getStatusLine().getStatusCode());
     }
 
@@ -439,7 +440,7 @@ public class TodoTest {
 
         }
         catch(Exception PasrException){
-            System.out.println("Failure");
+
         }
 
     }
@@ -506,7 +507,7 @@ public class TodoTest {
             HttpResponse httpResponse_delete = httpClient.execute(request_delete);
             assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 
-        } catch (Exception PasrException) {
+        } catch (Exception ParseException) {
             System.out.println("Failure at to_dos_post_title_param_test");
         }
     }
