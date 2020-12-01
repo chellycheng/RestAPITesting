@@ -11,17 +11,15 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
@@ -45,26 +43,43 @@ public class ProjectTest {
 	    final String completed = "completed";
 	    final String active = "active";
 	    static HttpURLConnection connection;
-	    
-	    @BeforeEach
-	    public void setup() throws Exception{
-	        try{
-	            URL url = new URL(baseUrl);
-	            connection= (HttpURLConnection) url.openConnection();
-	            connection.connect();
-	            assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
-	        }
-	        catch(Exception e){
-	            System.out.println("Error in conneciton");
-	            throw new Exception();
-	        }
-	    }
-	    
-	    @AfterAll
-	    public static void after() {
-	        connection.disconnect();
-	    }
-	    
+	private static Process process;
+	long allStart;
+	long partStart;
+
+
+	@BeforeEach
+	public void setup() throws Exception{
+		try{
+			allStart = System.currentTimeMillis();
+			ArrayList<String> command = new ArrayList<String>();
+			command.add("java"); // quick and dirty for unix
+			command.add("-jar");
+			command.add("/Users/hehuimincheng/ECSE429/runTodoManagerRestAPI-1.5.5.jar");
+
+			ProcessBuilder builder = new ProcessBuilder(command);
+			builder.redirectErrorStream(true);
+			process = builder.inheritIO().start();
+			Thread.sleep(500);
+			URL url = new URL(baseUrl);
+			connection= (HttpURLConnection) url.openConnection();
+			connection.connect();
+			assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
+			partStart = System.currentTimeMillis();
+		}
+		catch(Exception e){
+			System.out.println("Error in connection");
+			throw new Exception();
+		}
+	}
+
+	@AfterEach
+	public void afterClass() throws Exception{
+		System.out.println("The execute time without setup, teardown is  " + (System.currentTimeMillis()-partStart)/1000.0 +"s");
+		process.destroy();
+		Thread.sleep(500);
+		System.out.println("The execution time include setup, teardown, and check correctness is " + (System.currentTimeMillis()-allStart)/1000.0 + "s");
+	}
 	    
 
 	    @Test
@@ -74,7 +89,7 @@ public class ProjectTest {
 	        //Set request
 	        HttpUriRequest request = new HttpGet(  baseUrl+ projectEndPoint);
 	        HttpResponse httpResponse = httpClient.execute(request);
-
+			print_time_so_far(partStart);
 	        //Check response status
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	        //Check code
@@ -99,18 +114,9 @@ public class ProjectTest {
 	            throws ClientProtocolException, IOException {
 	        HttpHead request = new HttpHead(  baseUrl+ projectEndPoint );
 	        HttpResponse httpResponse = httpClient.execute( request );
+			print_time_so_far(partStart);
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	    }
-
-//	    @Test
-//	    public void to_dos_post_empty_test()
-//	            throws ClientProtocolException, IOException {
-//
-//	        HttpUriRequest request = new HttpPost(  baseUrl+ projectEndPoint );
-//	        HttpResponse httpResponse = httpClient.execute( request );
-//	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
-//
-//	    }
 	    
 	    @Test
 	    public void createProjectWithoutId()
@@ -130,7 +136,7 @@ public class ProjectTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(201, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -140,9 +146,6 @@ public class ProjectTest {
 	            assertEquals("false", (response_jason.get(completed)));
 	            assertEquals("true", (response_jason.get(active)));
 	            String id = (String)response_jason.get("id");
-//	            HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+id );
-//	            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-//	            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 	
 	        }
 	        catch(Exception PasrException){
@@ -162,7 +165,7 @@ public class ProjectTest {
 	        //Set request
 	        HttpUriRequest request = new HttpGet(  baseUrl+ projectEndPoint+ "?id="+ expected_id);
 	        HttpResponse httpResponse = httpClient.execute(request);
-
+			print_time_so_far(partStart);
 	        //Check response status
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	        //Check code
@@ -190,6 +193,7 @@ public class ProjectTest {
 	        String expected_id = "1";
 	        HttpUriRequest request = new HttpGet(  baseUrl+ projectEndPoint+ "?id="+ expected_id);
 	        HttpResponse httpResponse = httpClient.execute( request );
+			print_time_so_far(partStart);
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	    }
 
@@ -212,7 +216,7 @@ public class ProjectTest {
 		        request.addHeader("content-type", "application/json");
 		        request.setEntity(userEntity);
 		        HttpResponse httpResponse = httpClient.execute( request );
-		
+				print_time_so_far(partStart);
 		        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 		        try{
 		            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -252,7 +256,7 @@ public class ProjectTest {
 		        request.addHeader("content-type", "application/json");
 		        request.setEntity(userEntity);
 		        HttpResponse httpResponse = httpClient.execute( request );
-		
+				print_time_so_far(partStart);
 		        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 		        try{
 		            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -277,6 +281,7 @@ public class ProjectTest {
 	    	String delete_id = "3";
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+ delete_id );
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+			print_time_so_far(partStart);
             assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
@@ -292,7 +297,7 @@ public class ProjectTest {
 	        //Set request
 	        HttpUriRequest request = new HttpGet(  baseUrl+ projectEndPoint+ "/"+ expected_id+tasksEndIDPoint);
 	        HttpResponse httpResponse = httpClient.execute(request);
-
+			print_time_so_far(partStart);
 	        //Check response status
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	        //Check code
@@ -318,6 +323,7 @@ public class ProjectTest {
 	        String expected_id = "101";
 	        HttpUriRequest request = new HttpHead(  baseUrl+ projectEndPoint+ "/"+ expected_id+tasksEndIDPoint);
 	        HttpResponse httpResponse = httpClient.execute( request );
+			print_time_so_far(partStart);
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	    }
 
@@ -339,7 +345,7 @@ public class ProjectTest {
 	        HttpResponse httpResponse = httpClient.execute( request );
 	
 	        String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-
+			print_time_so_far(partStart);
 	        // This API has bug in exploratory text
 	        assertEquals(404, httpResponse.getStatusLine().getStatusCode());
 	        try{
@@ -366,6 +372,7 @@ public class ProjectTest {
 	    	String task_id = "2";
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+ project_id+ tasksEndIDPoint+"/"+ task_id );
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+			print_time_so_far(partStart);
             assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 
@@ -377,7 +384,7 @@ public class ProjectTest {
 	        //Set request
 	        HttpGet request = new HttpGet(  baseUrl+ projectEndPoint+ "/"+ project_id+categoriesEndPoint);
 	        HttpResponse httpResponse = httpClient.execute(request);
-
+			print_time_so_far(partStart);
 	        //Check response status
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	        //Check code
@@ -400,9 +407,10 @@ public class ProjectTest {
 	    public void getHeadersByCategory()
 	        throws ClientProtocolException, IOException {
 	    	  String expected_id = "99";
-		        HttpUriRequest request = new HttpHead(  baseUrl+ projectEndPoint+ "/"+ expected_id+categoriesEndPoint);
-		        HttpResponse httpResponse = httpClient.execute( request );
-		        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+			HttpUriRequest request = new HttpHead(  baseUrl+ projectEndPoint+ "/"+ expected_id+categoriesEndPoint);
+			HttpResponse httpResponse = httpClient.execute( request );
+			print_time_so_far(partStart);
+			assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	    }
 
 	    @Test
@@ -421,7 +429,7 @@ public class ProjectTest {
 	        HttpResponse httpResponse = httpClient.execute( request );
 	
 	        String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-
+			print_time_so_far(partStart);
 	        assertEquals(404, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	        	JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
@@ -444,6 +452,11 @@ public class ProjectTest {
 	    	String category_id = "1";
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+ project_id+ categoriesEndPoint+"/"+ category_id );
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+			print_time_so_far(partStart);
             assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
+
+		private void print_time_so_far(long start_time){
+			System.out.println("The execute time without setup, teardown, and check correctness is " + (System.currentTimeMillis()-start_time)/1000.0 + "s");
+		}
 }

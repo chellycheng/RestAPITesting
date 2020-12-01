@@ -11,17 +11,15 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
@@ -45,33 +43,49 @@ public class CategoriesTest {
 	    final String completed = "completed";
 	    final String active = "active";
 	    static HttpURLConnection connection;
-	    
-	    @BeforeEach
-	    public void setup() throws Exception{
-	        try{
-	            URL url = new URL(baseUrl);
-	            connection= (HttpURLConnection) url.openConnection();
-	            connection.connect();
-	            assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
-	        }
-	        catch(Exception e){
-	            System.out.println("Error in conneciton");
-	            throw new Exception();
-	        }
-	    }
-	    
-	    @AfterAll
-	    public static void after() {
-	        connection.disconnect();
-	    }
-	    
+	private static Process process;
+	long allStart;
+	long partStart;
+
+
+	@BeforeEach
+	public void setup() throws Exception{
+		try{
+			allStart = System.currentTimeMillis();
+			ArrayList<String> command = new ArrayList<String>();
+			command.add("java"); // quick and dirty for unix
+			command.add("-jar");
+			command.add("/Users/hehuimincheng/ECSE429/runTodoManagerRestAPI-1.5.5.jar");
+
+			ProcessBuilder builder = new ProcessBuilder(command);
+			builder.redirectErrorStream(true);
+			process = builder.inheritIO().start();
+			Thread.sleep(500);
+			URL url = new URL(baseUrl);
+			connection= (HttpURLConnection) url.openConnection();
+			connection.connect();
+			assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
+			partStart = System.currentTimeMillis();
+		}
+		catch(Exception e){
+			System.out.println("Error in connection");
+			throw new Exception();
+		}
+	}
+
+	@AfterEach
+	public void afterClass() throws Exception{
+		System.out.println("The execute time without setup, teardown is  " + (System.currentTimeMillis()-partStart)/1000.0 +"s");
+		process.destroy();
+		Thread.sleep(500);
+		System.out.println("The execution time include setup, teardown, and check correctness is " + (System.currentTimeMillis()-allStart)/1000.0 + "s");
+	}
 	    @Test 
 	    public void getCategories() throws ClientProtocolException, IOException {
-//	    	createCateogory();
 	        
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint);
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(200, response.getStatusLine().getStatusCode());
 	    	String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
 	    	try {
@@ -89,6 +103,7 @@ public class CategoriesTest {
 	    public void categoriesHead() throws ClientProtocolException, IOException {
 	        HttpHead request = new HttpHead(  baseUrl+categoriesEndPoint );
 	        HttpResponse httpResponse = httpClient.execute( request );
+			print_time_so_far(partStart);
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	    }
 	    
@@ -105,7 +120,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(201, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -131,7 +146,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(201, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -157,17 +172,8 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
-//	        try{
-//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-////	            assertEquals(title_value, (String) (response_jason.get(title)));
-//	            assertEquals(desc_value, (String) (response_jason.get(description)));
-//	        }
-//	        catch(Exception e){
-//	            System.out.println(e.getMessage());
-//	        }
 	    }
 	    
 	    @Test
@@ -184,17 +190,9 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
-//	        try{
-//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-//	            assertEquals(title_value, (String) (response_jason.get(title)));
-//	            assertEquals(desc_value, (String) (response_jason.get(description)));
-//	        }
-//	        catch(Exception e){
-//	            System.out.println(e.getMessage());
-//	        }
+
 	    }
 	    
 	    @Test
@@ -203,32 +201,19 @@ public class CategoriesTest {
 	        String title_value = "429 Test Category 5";
 	        String desc_value = "working in process 5";
 	        JSONObject json = new JSONObject();
-//	        json.put(title, title_value);
-//	        json.put(description, desc_value);
-//	        json.put(id, 1);
-	
 	        StringEntity userEntity = new StringEntity(json.toString());
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
-//	        try{
-//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-//	            assertEquals(title_value, (String) (response_jason.get(title)));
-//	            assertEquals(desc_value, (String) (response_jason.get(description)));
-//	        }
-//	        catch(Exception e){
-//	            System.out.println(e.getMessage());
-//	        }
 	    }
 	    
 	    @Test 
 	    public void getCategoriesById() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/1");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(200, response.getStatusLine().getStatusCode());
 	    	String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
 	    	try {
@@ -246,7 +231,7 @@ public class CategoriesTest {
 	    public void getCategoriesById2() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/1000");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(404, response.getStatusLine().getStatusCode());
 	    }
 	    
@@ -254,7 +239,7 @@ public class CategoriesTest {
 	    public void CategoryHeadById() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/1");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(200, response.getStatusLine().getStatusCode());
 	    }
 	    
@@ -262,7 +247,7 @@ public class CategoriesTest {
 	    public void CategoryHeadById2() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/100000000");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(404, response.getStatusLine().getStatusCode());
 	    }
 	    
@@ -279,7 +264,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -305,7 +290,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(404, httpResponse.getStatusLine().getStatusCode());
 	    }
 	    
@@ -322,13 +307,12 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
 	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
 	            assertEquals(title_value, (String) (response_jason.get(title)));
-//	            assertEquals(desc_value, (String) (response_jason.get(description)));
 	        }
 	        catch(Exception e){
 	            System.out.println(e.getMessage());
@@ -348,17 +332,8 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(400, httpResponse.getStatusLine().getStatusCode());
-//	        try{
-//	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-//	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-////	            assertEquals(title_value, (String) (response_jason.get(title)));
-//	            assertEquals(desc_value, (String) (response_jason.get(description)));
-//	        }
-//	        catch(Exception e){
-//	            System.out.println(e.getMessage());
-//	        }
 	    }
 
 	    @Test
@@ -375,7 +350,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -401,7 +376,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(404, httpResponse.getStatusLine().getStatusCode());
 	    }
 	    
@@ -418,7 +393,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -437,19 +412,17 @@ public class CategoriesTest {
 	    	String title_value = "429 Test Category 4";
 	        String desc_value = "working in process 4";
 	        JSONObject json = new JSONObject();
-//	        json.put(title, title_value);
 	        json.put(description, desc_value);
 	
 	        StringEntity userEntity = new StringEntity(json.toString());
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	
+			print_time_so_far(partStart);
 	        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
 	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-//	            assertEquals(title_value, (String) (response_jason.get(title)));
 	            assertEquals(desc_value, (String) (response_jason.get(description)));
 	        }
 	        catch(Exception e){
@@ -461,6 +434,7 @@ public class CategoriesTest {
 	    public void deleteCategoryById() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/2");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+			print_time_so_far(partStart);
             assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
@@ -468,6 +442,7 @@ public class CategoriesTest {
 	    public void deleteCategoryById2() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/200");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+			print_time_so_far(partStart);
             assertEquals(404, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
@@ -488,7 +463,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	        
+			print_time_so_far(partStart);
 	        assertEquals(201, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	        	String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -519,7 +494,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	        
+			print_time_so_far(partStart);
 	        assertEquals(404, httpResponse.getStatusLine().getStatusCode());
 	    }
 	    
@@ -527,7 +502,7 @@ public class CategoriesTest {
 	    public void getProjectsByCategoryId() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/1/projects");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(200, response.getStatusLine().getStatusCode());
 	    	String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
 	    	try {
@@ -544,7 +519,7 @@ public class CategoriesTest {
 	    public void getProjectsByCategoryId1() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/114514/projects");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(404, response.getStatusLine().getStatusCode());
 	    }
 	    
@@ -552,6 +527,7 @@ public class CategoriesTest {
 	    public void ProjectsHeadByCategoryId() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/1/projects");
 	    	HttpResponse response = httpClient.execute(request);
+			print_time_so_far(partStart);
 	    	assertEquals(200, response.getStatusLine().getStatusCode());
 	    }
 	    
@@ -559,6 +535,7 @@ public class CategoriesTest {
 	    public void ProjectsHeadByCategoryId1() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/114514/projects");
 	    	HttpResponse response = httpClient.execute(request);
+			print_time_so_far(partStart);
 	    	assertEquals(404, response.getStatusLine().getStatusCode());
 	    }
 	    
@@ -566,6 +543,7 @@ public class CategoriesTest {
 	    public void deleteProjectsByCategoryId() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/projects/1");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+			print_time_so_far(partStart);
             assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
@@ -573,7 +551,7 @@ public class CategoriesTest {
 	    public void getTodosByCategoryID() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/1/todos");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(200, response.getStatusLine().getStatusCode());
 	    	String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
 	    	try {
@@ -590,7 +568,7 @@ public class CategoriesTest {
 	    public void getTodosByCategoryID1() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpGet(baseUrl+categoriesEndPoint+"/114514/todos");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(404, response.getStatusLine().getStatusCode());
 	    }
 	    
@@ -598,7 +576,7 @@ public class CategoriesTest {
 	    public void TodosHeadByCategoryID() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/1/todos");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(200, response.getStatusLine().getStatusCode());
 	    }
 	    
@@ -606,7 +584,7 @@ public class CategoriesTest {
 	    public void TodosHeadByCategoryID2() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request = new HttpHead(baseUrl+categoriesEndPoint+"/114514/todos");
 	    	HttpResponse response = httpClient.execute(request);
-	    	
+			print_time_so_far(partStart);
 	    	assertEquals(404, response.getStatusLine().getStatusCode());
 	    }
 	    
@@ -625,7 +603,7 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
-	        
+			print_time_so_far(partStart);
 	        assertEquals(201, httpResponse.getStatusLine().getStatusCode());
 	        try{
 	        	String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -653,11 +631,13 @@ public class CategoriesTest {
 	        request.addHeader("content-type", "application/json");
 	        request.setEntity(userEntity);
 	        HttpResponse httpResponse = httpClient.execute( request );
+			print_time_so_far(partStart);
 	    }
 	    
 	    public void deleteTodosById() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/todos/1");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+			print_time_so_far(partStart);
             assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
@@ -665,6 +645,7 @@ public class CategoriesTest {
 	    public void deleteTodosById1() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/114514/todos/1");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+			print_time_so_far(partStart);
             assertEquals(404, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
 	    
@@ -672,7 +653,12 @@ public class CategoriesTest {
 	    public void deleteTodosById2() throws ClientProtocolException, IOException {
 	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ categoriesEndPoint+"/1/todos/114514");
             HttpResponse httpResponse_delete = httpClient.execute( request_delete );
+			print_time_so_far(partStart);
             assertEquals(404, httpResponse_delete.getStatusLine().getStatusCode());
 	    }
+
+		private void print_time_so_far(long start_time){
+			System.out.println("The execute time without setup, teardown, and check correctness is " + (System.currentTimeMillis()-start_time)/1000.0 + "s");
+		}
 	    
 }
