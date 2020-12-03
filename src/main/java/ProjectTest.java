@@ -84,8 +84,11 @@ public class ProjectTest {
 			ArrayList<String> command = new ArrayList<String>();
 			command.add("java"); // quick and dirty for unix
 			command.add("-jar");
-			command.add("/Users/hezirui/Downloads/runTodoManagerRestAPI-1.5.5.jar");
-
+			if(System.getProperties().getProperty("user.name").equals("Pengnan Fan")) {
+            	command.add("D:\\McGill\\20Fall\\ECSE 429\\runTodoManagerRestAPI-1.5.5.jar");
+            } else {
+            	command.add("/Users/hehuimincheng/ECSE429/runTodoManagerRestAPI-1.5.5.jar");
+            }
 			ProcessBuilder builder = new ProcessBuilder(command);
 			builder.redirectErrorStream(true);
 			process = builder.inheritIO().start();

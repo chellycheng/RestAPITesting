@@ -1,235 +1,255 @@
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.apache.http.client.ClientProtocolException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Random;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.MethodOrderer.Alphanumeric;
 import org.apache.http.HttpResponse;
+import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Random;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@TestMethodOrder(Alphanumeric.class)
-public class AddRandomProject {
+public class AddRandomCategory {
 
-	 public static final String baseUrl = "http://localhost:4567/";
-	    public static final String projectEndPoint = "projects";
-	    public static final String tasksEndIDPoint = "/tasks";
-	    public static final String categoriesEndPoint = "/categories";
-	    public JSONParser jsonParser = new JSONParser();
-	    public HttpClient httpClient = HttpClientBuilder.create().build();
+    public static final String baseUrl = "http://localhost:4567/";
+    public static final String toDoEndPoint = "todos";
+    public static final String toDoEndIDPoint = "todos/";
+    public static final String tasksOfEndPoint = "/tasksof";
+    public static final String projectEndPoint = "projects";
+    public static final String tasksEndIDPoint = "/tasks";
+    public static final String categoriesEndPoint = "/categories";
+    static public JSONParser jsonParser = new JSONParser();
+    static public HttpClient httpClient = HttpClientBuilder.create().build();
 
-	    final String id = "id";
-	    final String description = "description";
-	    final String title = "title";
-	    final String status = "doneStatus";
-	    final String todos = "todos";
-	    final String categories = "categories";
-	    final String project ="projects";
-	    final String completed = "completed";
-	    final String active = "active";
-	    static HttpURLConnection connection;
-	private static Process process;
-	long allStart;
-	long partStart;
-	
-	
-	@BeforeAll
-	public static void generateProject() throws Exception{
-//		try{
-//			//allStart = System.currentTimeMillis();
-//			ArrayList<String> command = new ArrayList<String>();
-//			command.add("java"); // quick and dirty for unix
-//			command.add("-jar");
-//			command.add("/Users/hezirui/Downloads/runTodoManagerRestAPI-1.5.5.jar");
-//
-//			ProcessBuilder builder = new ProcessBuilder(command);
-//			builder.redirectErrorStream(true);
-//			process = builder.inheritIO().start();
-//			Thread.sleep(1000);
-//			URL url = new URL(baseUrl);
-//			connection= (HttpURLConnection) url.openConnection();
-//			connection.connect();
-//			assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
-//			//partStart = System.currentTimeMillis();
-//		}
-//		catch(Exception e){
-//			System.out.println("Error in connection");
-//			throw new Exception();
-//		}
-		
-		for (int i = 0; i < 1000; i++) {
-			new AddRandomProject().createRandomProjects();
-		}
-	}
-
-	@BeforeEach
-	public void setup() throws Exception{
-		try{
-			//allStart = System.currentTimeMillis();
-			partStart = System.currentTimeMillis();
-		}
-		catch(Exception e){
-			System.out.println("Error in connection");
-			throw new Exception();
-		}
-	}
-
-	@AfterEach
-	public void afterClass() throws Exception{
-		System.out.println("The execute time without setup, teardown is  " + (System.currentTimeMillis()-partStart)/1000.0 +"s");
-//		process.destroy();
-//		Thread.sleep(500);
-//		System.out.println("The execution time include setup, teardown, and check correctness is " + (System.currentTimeMillis()-allStart)/1000.0 + "s");
-	}
-	    
-	    
-	    @Test
-	    public void createProjectWithoutId()
-	            throws ClientProtocolException, IOException {
-	        HttpPost request = new HttpPost(  baseUrl+ projectEndPoint );
-	        String title_value = "429 Test Project";
-	        String desc_value = "working in process";
-	        Boolean completed_status = false;
-	        Boolean active_status = true;
-	        JSONObject json = new JSONObject();
-	        json.put(title, title_value);
-	        json.put(description, desc_value);
-	        json.put(completed, completed_status);
-	        json.put(active, active_status);
-	
-	        StringEntity userEntity = new StringEntity(json.toString());
-	        request.addHeader("content-type", "application/json");
-	        request.setEntity(userEntity);
-	        HttpResponse httpResponse = httpClient.execute( request );
-			//print_time_so_far(partStart);
-	        assertEquals(201, httpResponse.getStatusLine().getStatusCode());
-	        try{
-	            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-	            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-	            assertEquals(title_value, (String) (response_jason.get(title)));
-	            assertEquals(desc_value, (String) (response_jason.get(description)));
-	            assertEquals("false", (response_jason.get(completed)));
-	            assertEquals("true", (response_jason.get(active)));
-	            String id = (String)response_jason.get("id");
-	
-	        }
-	        catch(Exception ParseException){
-	            System.out.println("Failure at createProjectWithoutId");
-	        }
-	
-	    }
+    static final String id = "id";
+    static final String description = "description";
+    static final String title = "title";
+    static final String status = "doneStatus";
+    static final String todos = "todos";
+    static final String categories = "categories";
+    static final String project ="projects";
+    static final String completed = "completed";
+    static final String active = "active";
+    static HttpURLConnection connection;
+    private static Process process;
+    static ArrayList<String> generatedString = new ArrayList<String>();
+    static ArrayList<Integer> generatedID = new ArrayList<Integer>();
+    static Random random = new Random(2020);
 
 
-	    
-	    @Test
-	    public void updateProjectById()
-	            throws ClientProtocolException, IOException{
-	    	 //this.createProjectWithoutId();
-	    	
-	    	 String expected_id = "500";
-	    	 HttpPut request = new HttpPut(  baseUrl+ projectEndPoint+ "/"+ expected_id);
-		        String title_value = "Office Work";
-		        String desc_value = "";
-		        Boolean completed_status = false;
-		        Boolean active_status = false;
-		        JSONObject json = new JSONObject();
-		        json.put(title, title_value);
-		        json.put(description, desc_value);
-		        json.put(completed, completed_status);
-		        json.put(active, active_status);
-		
-		        StringEntity userEntity = new StringEntity(json.toString());
-		        request.addHeader("content-type", "application/json");
-		        request.setEntity(userEntity);
-		        HttpResponse httpResponse = httpClient.execute( request );
-				//print_time_so_far(partStart);
-		        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
-		        try{
-		            String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-		            JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
-		            assertEquals(title_value, (String) (response_jason.get(title)));
-		            assertEquals(desc_value, (String) (response_jason.get(description)));
-		            assertEquals("false", (response_jason.get(completed)));
-		            assertEquals("false", (response_jason.get(active)));
-		            String id = (String)response_jason.get("id");
-		
-		        }
-		        catch(Exception ParseException){
-		            System.out.println("Failure at updateProjectById");
-		        }
+    public static void main(String[] args) {
+        long start_time = 0;
+        try{
+            startServer();
+            start_time = System.currentTimeMillis();
+            //------Here you can add any test you like------
+            //Notice that Add-> Modify-> Delete in order
+            //EndPoint should include /
+            //The number for one group of testing should be the same
+            //It totally depends on you to disable the verbose
+            //------Here you can add any test you like------
+            int delete_freq = 10;
+            for(int i=0; i<10000; i++) {
+            	sendAddRequests(projectEndPoint,1,true);
+                sendModifyRequests(projectEndPoint+'/', 1, true);
+                if(i%delete_freq==0) {
+                	sendDeleteRequests(projectEndPoint+'/', 1, true);
+                }
+                System.out.println("progress: "+i+"/"+10000);
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            System.out.println("Finish the testing " + (System.currentTimeMillis()-start_time));
+            stopServer();
+        }
 
-	    }
-	    
-	    @Test
-	    public void deleteProjectById()
-	    		throws ClientProtocolException, IOException {
-	    	this.createProjectWithoutId();
-	    	String delete_id = "600";
-	    	HttpUriRequest request_delete = new HttpDelete(  baseUrl+ projectEndPoint+"/"+ delete_id );
-            HttpResponse httpResponse_delete = httpClient.execute( request_delete );
-            assertEquals(200, httpResponse_delete.getStatusLine().getStatusCode());
-	    }
-	    
-	    
-	    private void createRandomProjects()
-	            throws ClientProtocolException, IOException {
-	        HttpPost request = new HttpPost(  baseUrl+ projectEndPoint );
-	        
-	        byte[] array = new byte[7]; // length is bounded by 7
-	        new Random().nextBytes(array);
-	        String title_value = randomString();
-	        String desc_value = randomString();
-	        
-	        //String title_value = "Random Test Project";
-	        //String desc_value = "random process";
-	        Boolean completed_status = false;
-	        Boolean active_status = true;
-	        JSONObject json = new JSONObject();
-	        json.put(title, title_value);
-	        json.put(description, desc_value);
-	        json.put(completed, completed_status);
-	        json.put(active, active_status);
-	
-	        StringEntity userEntity = new StringEntity(json.toString());
-	        request.addHeader("content-type", "application/json");
-	        request.setEntity(userEntity);
-	        HttpResponse httpResponse = httpClient.execute( request );
-	
-	    }
-	    
-	    private String randomString() {
-	        int leftLimit = 97; // letter 'a'
-	        int rightLimit = 122; // letter 'z'
-	        int targetStringLength = 10;
-	        Random random = new Random();
-	        StringBuilder buffer = new StringBuilder(targetStringLength);
-	        for (int i = 0; i < targetStringLength; i++) {
-	            int randomLimitedInt = leftLimit + (int) 
-	              (random.nextFloat() * (rightLimit - leftLimit + 1));
-	            buffer.append((char) randomLimitedInt);
-	        }
-	        String generatedString = buffer.toString();
-	        return generatedString;
-	    }
 
-		private void print_time_so_far(long start_time){
-			System.out.println("The execute time without setup, teardown, and check correctness is " + (System.currentTimeMillis()-start_time)/1000.0 + "s");
-		}
+    }
+
+    public static void startServer(){
+        try{
+            ArrayList<String> command = new ArrayList<String>();
+            command.add("java"); // quick and dirty for unix
+            command.add("-jar");
+            if(System.getProperties().getProperty("user.name").equals("Pengnan Fan")) {
+            	command.add("D:\\McGill\\20Fall\\ECSE 429\\runTodoManagerRestAPI-1.5.5.jar");
+            } else {
+            	command.add("/Users/hehuimincheng/ECSE429/runTodoManagerRestAPI-1.5.5.jar");
+            }
+            
+            ProcessBuilder builder = new ProcessBuilder(command);
+            builder.redirectErrorStream(true);
+            process = builder.inheritIO().start();
+            Thread.sleep(500);
+            URL url = new URL(baseUrl);
+            connection= (HttpURLConnection) url.openConnection();
+            connection.connect();
+            assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
+        }
+        catch(Exception e){
+            System.out.println("Error in connection");
+        }
+    }
+
+    public static void stopServer(){
+        try{
+            process.destroy();
+        }
+        catch(Exception e){
+            System.out.println("Error in connection");
+        }
+    }
+
+    public static String randomTitleGenerator(boolean verbose){
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        if(verbose)
+            System.out.println("New generated string: "+ generatedString);
+        return generatedString;
+    }
+
+    /**
+     *
+     * @param range The range of random number
+     * @param verbose If print out this random int
+     * @return
+     */
+    public static int randomOtherIdGenerator(int range, boolean verbose ){
+        int randomInteger = random.nextInt(range);
+        if(verbose)
+            System.out.println("pseudo random int in a range : " + randomInteger);
+        return randomInteger;
+
+    }
+
+    /**
+     * This funciton is for adding new todo, category, projects
+     * TODOENDPOINT, CATEGORYENDPOINT
+     * PROJECTENDPOINT
+     * @param endPoint
+     * @param num The number of sample
+     */
+    public static void sendAddRequests(String endPoint, int num, boolean verbose){
+        try {
+            for(int i =0; i <num ;i++){
+                JSONObject json = new JSONObject();
+                //TITLE
+                String random_title_value = randomTitleGenerator(verbose);
+                json.put(title, random_title_value);
+                generatedString.add(random_title_value);
+                StringEntity userEntity = new StringEntity(json.toString());
+                
+                JSONObject response_jason = send_post_request(endPoint, 201, userEntity);
+                
+                String result_id_string = (String) response_jason.get("id");
+                int result_id = Integer.parseInt(result_id_string);
+                if(verbose)
+                    System.out.println("New created : "+ result_id);
+                generatedID.add(result_id);
+            }
+            System.out.println("-------------");
+        } catch (Exception ParseException) {
+            System.out.println("Failure at AddTestS1");
+        }
+    }
+    /*
+        Notice this num should be consistent with the previous one
+     */
+    public static void sendModifyRequests(String endPoint, int num, boolean verbose){
+        try {
+            for(int i =0; i <num ;i++){
+                JSONObject json = new JSONObject();
+                //TITLE
+                json.put(title, generatedString.get(0));
+                //Description
+                json.put(description, randomTitleGenerator(verbose));
+                StringEntity userEntity = new StringEntity(json.toString());
+                send_post_request(endPoint+generatedID.get(0), 200, userEntity);
+            }
+            System.out.println("-------------");
+        } catch (Exception ParseException) {
+            System.out.println("Failure at AddTestS1");
+        }
+    }
+
+    /*
+    Notice this num should be consistent with the previous one
+    */
+    public static void sendDeleteRequests(String endPoint, int num, boolean verbose){
+        try {
+            for(int i =0; i <num ;i++){
+                if(verbose)
+                    System.out.println("Delete ID: "+ generatedID.get(0));
+                send_delete_request(endPoint+generatedID.get(0), 200);
+                generatedID.remove(0);
+                generatedString.remove(0);
+            }
+            System.out.println("-------------");
+        } catch (Exception ParseException) {
+            System.out.println("Failure at AddTestS1");
+        }
+    }
+
+    /**
+     * If there is a need you can uncommented those
+     * @param toDoEndPoint
+     * @param status
+     * @throws IOException
+     * @throws ParseException
+     */
+    static void send_request(String toDoEndPoint, int status) throws IOException, ParseException {
+        HttpUriRequest request = new HttpGet(  baseUrl+ toDoEndPoint);
+        httpClient = HttpClientBuilder.create().build();
+        HttpResponse httpResponse = httpClient.execute(request);
+        assertEquals(status, httpResponse.getStatusLine().getStatusCode());
+//        String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+//        JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+//        return response_jason;
+    }
+
+    static JSONObject send_post_request(String toDoEndPoint,int status, StringEntity userEntity) throws IOException, ParseException {
+        HttpPost request = new HttpPost(  baseUrl+ toDoEndPoint);
+        request.addHeader("content-type", "application/json");
+        request.setEntity(userEntity);
+        httpClient = HttpClientBuilder.create().build();
+        HttpResponse httpResponse = httpClient.execute(request);
+        assertEquals(status, httpResponse.getStatusLine().getStatusCode());
+        String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+        JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+        return response_jason;
+    }
+
+    static void send_delete_request(String toDoEndPoint,int status) throws IOException, ParseException {
+        HttpUriRequest request = new HttpDelete(  baseUrl+ toDoEndPoint);
+        httpClient = HttpClientBuilder.create().build();
+        HttpResponse httpResponse = httpClient.execute(request);
+        if(status!=0) {
+            assertEquals(status, httpResponse.getStatusLine().getStatusCode());
+        }
+
+//        String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+//        JSONObject response_jason = (JSONObject) jsonParser.parse(responseBody);
+//        return response_jason;
+    }
+
 }

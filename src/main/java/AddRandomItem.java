@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AddRandomItem {
+public class AddRandomCategory {
 
     public static final String baseUrl = "http://localhost:4567/";
     public static final String toDoEndPoint = "todos";
@@ -58,13 +58,16 @@ public class AddRandomItem {
             //EndPoint should include /
             //The number for one group of testing should be the same
             //It totally depends on you to disable the verbose
-            sendAddRequests(toDoEndPoint,3,true);
-            sendModifyRequests(toDoEndIDPoint, 3, true);
-            sendDeleteRequests(toDoEndIDPoint,3, true);
-            System.out.println("Finish the testing " + (System.currentTimeMillis()-start_time));
-            stopServer();
             //------Here you can add any test you like------
-
+            int delete_freq = 10;
+            for(int i=0; i<10000; i++) {
+            	sendAddRequests(toDoEndPoint,1,true);
+                sendModifyRequests(toDoEndPoint+'/', 1, true);
+                if(i%delete_freq==0) {
+                	sendDeleteRequests(toDoEndPoint+'/', 1, true);
+                }
+                System.out.println("progress: "+i+"/"+10000);
+            }
         }
         catch(Exception e){
             e.printStackTrace();
@@ -82,8 +85,12 @@ public class AddRandomItem {
             ArrayList<String> command = new ArrayList<String>();
             command.add("java"); // quick and dirty for unix
             command.add("-jar");
-            command.add("/Users/hehuimincheng/ECSE429/runTodoManagerRestAPI-1.5.5.jar");
-
+            if(System.getProperties().getProperty("user.name").equals("Pengnan Fan")) {
+            	command.add("D:\\McGill\\20Fall\\ECSE 429\\runTodoManagerRestAPI-1.5.5.jar");
+            } else {
+            	command.add("/Users/hehuimincheng/ECSE429/runTodoManagerRestAPI-1.5.5.jar");
+            }
+            
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);
             process = builder.inheritIO().start();
@@ -151,8 +158,9 @@ public class AddRandomItem {
                 json.put(title, random_title_value);
                 generatedString.add(random_title_value);
                 StringEntity userEntity = new StringEntity(json.toString());
-
+                
                 JSONObject response_jason = send_post_request(endPoint, 201, userEntity);
+                
                 String result_id_string = (String) response_jason.get("id");
                 int result_id = Integer.parseInt(result_id_string);
                 if(verbose)
@@ -172,11 +180,11 @@ public class AddRandomItem {
             for(int i =0; i <num ;i++){
                 JSONObject json = new JSONObject();
                 //TITLE
-                json.put(title, generatedString.get(i));
+                json.put(title, generatedString.get(0));
                 //Description
                 json.put(description, randomTitleGenerator(verbose));
                 StringEntity userEntity = new StringEntity(json.toString());
-                send_post_request(endPoint+generatedID.get(i), 200, userEntity);
+                send_post_request(endPoint+generatedID.get(0), 200, userEntity);
             }
             System.out.println("-------------");
         } catch (Exception ParseException) {
@@ -191,8 +199,10 @@ public class AddRandomItem {
         try {
             for(int i =0; i <num ;i++){
                 if(verbose)
-                    System.out.println("Delete ID: "+ generatedID.get(i));
-                send_delete_request(endPoint+generatedID.get(i), 200);
+                    System.out.println("Delete ID: "+ generatedID.get(0));
+                send_delete_request(endPoint+generatedID.get(0), 200);
+                generatedID.remove(0);
+                generatedString.remove(0);
             }
             System.out.println("-------------");
         } catch (Exception ParseException) {
@@ -209,6 +219,7 @@ public class AddRandomItem {
      */
     static void send_request(String toDoEndPoint, int status) throws IOException, ParseException {
         HttpUriRequest request = new HttpGet(  baseUrl+ toDoEndPoint);
+        httpClient = HttpClientBuilder.create().build();
         HttpResponse httpResponse = httpClient.execute(request);
         assertEquals(status, httpResponse.getStatusLine().getStatusCode());
 //        String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -220,6 +231,7 @@ public class AddRandomItem {
         HttpPost request = new HttpPost(  baseUrl+ toDoEndPoint);
         request.addHeader("content-type", "application/json");
         request.setEntity(userEntity);
+        httpClient = HttpClientBuilder.create().build();
         HttpResponse httpResponse = httpClient.execute(request);
         assertEquals(status, httpResponse.getStatusLine().getStatusCode());
         String responseBody = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
@@ -229,6 +241,7 @@ public class AddRandomItem {
 
     static void send_delete_request(String toDoEndPoint,int status) throws IOException, ParseException {
         HttpUriRequest request = new HttpDelete(  baseUrl+ toDoEndPoint);
+        httpClient = HttpClientBuilder.create().build();
         HttpResponse httpResponse = httpClient.execute(request);
         if(status!=0) {
             assertEquals(status, httpResponse.getStatusLine().getStatusCode());
