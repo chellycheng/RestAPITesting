@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AddRandomCategory {
+public class AddRandomItem {
 
     public static final String baseUrl = "http://localhost:4567/";
     public static final String toDoEndPoint = "todos";
